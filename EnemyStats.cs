@@ -1,49 +1,45 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemyStats : MonoBehaviour
 {
-    [SerializeField] SpriteRenderer spriteRenderer;
-    [SerializeField] public int maxHp;
-    [SerializeField] public int Hp;
-    [SerializeField] SwingController swingController;
+    [SerializeField] public float health = 3;
+    public float maxHealth;
+    private SpriteRenderer enemySprite;
 
     // Start is called before the first frame update
     void Start()
     {
-        maxHp = 10;
-        Hp = maxHp;
+        maxHealth = health;
+        enemySprite = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 
-    private void OnTriggerEnter2D(Collider2D hitbox)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (hitbox.CompareTag("AttackRange"))
+        if (collision.gameObject.CompareTag("Bullet"))
         {
-            if (Hp > 0)
-            {
-                Hp -= swingController.atkDamage;
-                StartCoroutine(HitReg());
+            StartCoroutine(TakeDamage());
+        }
+    }
 
-                if (Hp == 0)
-                {
-                    Destroy(gameObject);
-                }
-            }
+    IEnumerator TakeDamage()
+    {
+        health--;
+
+        if (health <= 0)
+        {
+            Destroy(gameObject);
         }
 
-        IEnumerator HitReg()
-        {
-            spriteRenderer.color = Color.red;
-            yield return new WaitForSeconds(0.1f);
-            spriteRenderer.color = Color.white;
-        }
+        enemySprite.color = Color.red;
+        yield return new WaitForSeconds(0.1f);
+        enemySprite.color = Color.white;
     }
 }
